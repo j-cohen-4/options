@@ -18,7 +18,7 @@ findATMCall <- function(theDate, sym, r=0.0185, product="crude", opt.inc=1){
     
     # Get futures price
     fp = as.numeric(prod.futures[theDate, sym]);
-    if(length(fp) == 0){
+    if(length(fp) == 0 || is.na(fp)){
         message(cat("findATMCall: Unable to load futures price for ", sym, sep=""));
         return(ret.obj);
     }

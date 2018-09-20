@@ -17,6 +17,8 @@ createConstantMaturityCrudeFuture <- function(nDays, product="crude"){
       
       # The returns
       prod.returns  = diff(log(prod.futures));
+      prod.returns  = exp(prod.returns) - 1;
+      prod.names    = colnames(prod.returns);
 
       nCount = nrow(prod.dte.futures);
       for(i in 1:nCount){
@@ -45,9 +47,17 @@ createConstantMaturityCrudeFuture <- function(nDays, product="crude"){
                   # Interpolate
                   r1 = as.numeric(prod.returns[dt, idx1]);
                   r2 = as.numeric(prod.returns[dt, idx2]);
-                  w1 = (dte2 - nDays) / (dte2 - dte1);
-                  w2 = 1 - w1;
-                  r  = (r1 * w1) + (r2 * w2);
+                  
+                  # If a problem, typically with second month
+                  if(is.na(r2)){
+                      message(sprintf("Second month[%s] has NA for return on %s, using front month[%s] at %d DTE", 
+                                      prod.names[idx2], dt, prod.names[idx1], dte1));
+                      r  = r1;
+                  } else {
+                      w1 = (dte2 - nDays) / (dte2 - dte1);
+                      w2 = 1 - w1;
+                      r  = (r1 * w1) + (r2 * w2);
+                  }
               }
               
               if(exists("const.mat")){
