@@ -14,6 +14,12 @@ generateOptionDatTbl <- function(xtsRow){
     sCols = colnames(xtsRow);
     nRow  = 1;
     
+    # There seems to be times in the data where holidays show valid data from some contracts
+    # and not others (bug was found relating to 1/21/2013, MLK day -- future = NA, options=prc,
+    # BOTH NEEDED)
+    if(is.na(spot) || is.null(spot)){
+        return(NULL);
+    }
     for(i in 1:nLen){
   
         idx      = i+1;
