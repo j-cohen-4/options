@@ -112,7 +112,7 @@ addFuturesMA <- function(iv.dataset, cmf, ma_length=50){
     dt.start = max(index(cuml.cmf[1,]), iv.dataset$t[1]);
     dt.end   = min(index(tail(cuml.cmf, 1)), tail(iv.dataset$t,1));
     new.df   = iv.dataset[iv.dataset$t >= dt.start & iv.dataset$t <= dt.end, ];
-    new.df   = cbind(new.df, coredata(cmf.ma[index(new.df$t),]));
+    new.df   = cbind(new.df, coredata(cmf.ma[new.df$t,]));
     
     return(new.df);
 }
