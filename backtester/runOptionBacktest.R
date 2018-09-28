@@ -4,7 +4,8 @@ runOptionBacktest <- function(opt.ds,
                               use.futures, 
                               opt.delta, 
                               trade.len, 
-                              product){
+                              product,
+                              chart.results=FALSE){
   
     # A few assumptions to start: 1) selling options, 2) using ivTOma
     # In addition, may adjust to sell both calls and puts if use.futures is TRUE,
@@ -45,7 +46,9 @@ runOptionBacktest <- function(opt.ds,
         colnames(out.obj$total) = c("call","put");
         
         # Plot
-        plotOptionTradeResults(out.obj);
+        if(chart.results == TRUE){
+            plotOptionTradeResults(out.obj);
+        }
         return(out.obj);
         
     } else {
@@ -55,8 +58,9 @@ runOptionBacktest <- function(opt.ds,
         pl            = calcOptionPLFromTable(trd.processed);
         
         # Plot pl and trades
-        plotOptionTradeResults(pl);
-
+        if(chart.results == TRUE){
+            plotOptionTradeResults(pl);
+        }
         return(pl);
     }
 }
