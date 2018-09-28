@@ -18,7 +18,7 @@ processSignals <- function(all.dates, signals, is.buy, opt.delta, hold.period, p
         
         current.date = trade.dates[i];
         
-        if(is.null(tradeDt) && current.date == signals$t[1]){
+        if(is.null(tradeDt) && current.date == signals$t[1] && i < nRows){
             # New trade
             tradeDt = signals$t[1];
             closeDt = tradeDt + hold.period;
@@ -27,6 +27,11 @@ processSignals <- function(all.dates, signals, is.buy, opt.delta, hold.period, p
             
             # Get the option to trade -- keep the constant for life of trade
             the.opt                            = findOption(tradeDt, dte=120, dDelta=opt.delta, product=product);
+            if(is.null(the.opt)){
+                # No trade so clear tradeDt
+                tradeDt = NULL;
+                next; 
+            }
             trade.action                       = ifelse(is.buy, 1, -1);
             trade.contract                     = the.opt[1, 'contract'];
             trade.futures                      = the.opt[1, 'future'];
