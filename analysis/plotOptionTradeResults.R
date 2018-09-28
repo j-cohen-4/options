@@ -14,11 +14,11 @@ plotOptionTradeResults <- function(trade.data){
     # PL
     par(mfrow=c(2,1));
     if(ncol(trade.data$total) == 1){
-        plot(cumprod(trade.data$total+1)-1, main="Total PL");
+        print(plot.xts(cumprod(trade.data$total+1)-1, main="Total PL"));
     } else {
-        plotMultiple(xts(apply(trade.data$total+1, 2, cumprod)-1, order.by=index(trade.data$total)),
-                     theLegend="topleft",
-                     theTitle ="Call and Put PL");
+        print(plot.xts(xts(apply(trade.data$total+1, 2, cumprod)-1, order.by=index(trade.data$total)),
+                     legend.loc ="topleft",
+                     main ="Call and Put PL"));
     }
     # Trades in a box plot
     boxplot(t(trade.data$trades[,2:4]));
