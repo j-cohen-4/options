@@ -112,6 +112,13 @@ addFuturesMA <- function(iv.dataset, cmf, ma_length=50){
     dt.start = max(index(cuml.cmf[1,]), iv.dataset$t[1]);
     dt.end   = min(index(tail(cuml.cmf, 1)), tail(iv.dataset$t,1));
     new.df   = iv.dataset[iv.dataset$t >= dt.start & iv.dataset$t <= dt.end, ];
+    
+    # Error checking
+    if(nrow(new.df) > nrow(cmf.ma[new.df$t,])){
+        # Remove extra dates -- most likely holidays that shouldn't be there in the first place
+        missing.dates = as.Date(setdiff(new.df$t, index(cmf.ma[new.df$t,])));
+        new.df = new.df[!(new.df$t %in% missing.dates),];
+    }
     new.df   = cbind(new.df, coredata(cmf.ma[new.df$t,]));
     
     return(new.df);
