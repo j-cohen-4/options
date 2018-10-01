@@ -27,7 +27,8 @@ buildCompleteDataset <- function(list.params){
     new.data  = buildDatasetForImpliedVol(cmf.ret     = const.fut, 
                                           iv          = const.iv$xts[,1], 
                                           lb          = final.params$cone.len,
-                                          period.days = final.params$look.fwd);
+                                          period.days = final.params$look.fwd, 
+                                          param.list  = list.params);
     message("DONE", appendLF=TRUE);
     
     message("\tAppending Moving Averages...", appendLF=FALSE);

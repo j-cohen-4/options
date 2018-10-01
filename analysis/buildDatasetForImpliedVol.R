@@ -1,4 +1,9 @@
-buildDatasetForImpliedVol <- function(cmf.ret, iv, rv=NULL, lb=(252*5), period.days=30){
+buildDatasetForImpliedVol <- function(cmf.ret, 
+                                      iv, 
+                                      rv          = NULL, 
+                                      lb          = (252*5), 
+                                      period.days = 30, 
+                                      param.list  = NULL){
   
     # This function takes the input data and generates a dataset that can be used to 
     # run regressions.
@@ -10,7 +15,20 @@ buildDatasetForImpliedVol <- function(cmf.ret, iv, rv=NULL, lb=(252*5), period.d
     df.dat = data.frame(t=as.Date(character()), iv=numeric(), z=numeric(), 
                         tnext=as.Date(character()), fwdiv=numeric(), bottom=numeric(),
                         two.five=numeric(), five.zero=numeric(), seven.five=numeric(),
-                        top=numeric(),stringsAsFactors=FALSE); 
+                        top=numeric(),stringsAsFactors=FALSE);
+    
+    vol.cone.idx = 4;
+    cone.lengths = c(21, 42, 63, 126, 252);
+    if(!is.null(param.list) && param.list$type=="data.param.list"){
+        # Match the const expiration length for cone calculations
+        if(!(param.list$iv.days %in% cone.lengths)){
+            cone.lengths[5] = param.list$iv.days;
+            vol.cone.idx    = 5;
+        } else {
+            vol.cone.idx = which(cone.lengths == param.list$iv.days);
+        }
+    }
+    
     nRows = nrow(iv);
     nNext = 0.1;
     for(i in 1:nRows){
@@ -18,11 +36,13 @@ buildDatasetForImpliedVol <- function(cmf.ret, iv, rv=NULL, lb=(252*5), period.d
         # For this date, use lookback of lb to build volatility cones
         today   = index(iv[i]);
         idx.fut = tail(which(index(cmf.ret) < today), 1);
-#        if(idx.fut < lb){  next; }                    # Not enough data, just continue
         
         # Get cones
         if(idx.fut >= lb){
-        vc = getVolaCone(cmf.ret[(idx.fut - lb + 1):idx.fut], bPlot=FALSE);
+        vc = getVolaCone2(cmf.ret[(idx.fut - lb + 1):idx.fut], 
+                         bPlot=FALSE, 
+                         cone.lengths=cone.lengths, 
+                         ret.type="arith");
         } else { vc = NULL;}
         
         # Does dependent variable exist?
@@ -46,11 +66,11 @@ buildDatasetForImpliedVol <- function(cmf.ret, iv, rv=NULL, lb=(252*5), period.d
         df.dat[nAdded, 'fwdiv'] = fwdIV;
         
         if(!is.null(vc)){
-        df.dat[nAdded, 'bottom']     = as.numeric(vc$cones[4, 1]);
-        df.dat[nAdded, 'two.five']   = as.numeric(vc$cones[4, 2]);
-        df.dat[nAdded, 'five.zero']  = as.numeric(vc$cones[4, 3]);
-        df.dat[nAdded, 'seven.five'] = as.numeric(vc$cones[4, 4]);
-        df.dat[nAdded, 'top']        = as.numeric(vc$cones[4, 5]);
+        df.dat[nAdded, 'bottom']     = as.numeric(vc$cones[vol.cone.idx, 1]);
+        df.dat[nAdded, 'two.five']   = as.numeric(vc$cones[vol.cone.idx, 2]);
+        df.dat[nAdded, 'five.zero']  = as.numeric(vc$cones[vol.cone.idx, 3]);
+        df.dat[nAdded, 'seven.five'] = as.numeric(vc$cones[vol.cone.idx, 4]);
+        df.dat[nAdded, 'top']        = as.numeric(vc$cones[vol.cone.idx, 5]);
         }
         if( i / nRows > nNext){
             message(sprintf("\n%.1f percent complete!", i / nRows));
