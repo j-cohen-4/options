@@ -1,3 +1,5 @@
 .Rproj.user*/
 options.Rproj
 .Rhistory
+data*/
+.Rprofile
