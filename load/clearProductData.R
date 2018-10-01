@@ -19,7 +19,7 @@ clearProductData <- function(prod.name){
         }
         
     } else {
-        message("clearProductData: No data for %s, unable to delete contract data!");
+        message(sprintf("clearProductData: No data for %s, unable to delete contract data!", prod.name));
     }
 
 
