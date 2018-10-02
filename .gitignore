@@ -3,3 +3,4 @@ options.Rproj
 .Rhistory
 data*/
 .Rprofile
+.RData
