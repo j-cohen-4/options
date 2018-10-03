@@ -24,6 +24,12 @@ runOptionBacktest <- function(opt.ds,
     cone.cols = 6:9;
     filtered  = filtered[filtered$iv >= filtered[,cone.cols[nConeQuadrant]], ];
     
+    # Filtered dataset needs at least 1 row
+    if(nrow(filtered) <= 0){
+        message("runOptionBacktest: Unable to run because filters return empty dataset!");
+        return(NULL);
+    }
+    
     if(use.futures == TRUE){
       
         call.delta = abs(opt.delta);
