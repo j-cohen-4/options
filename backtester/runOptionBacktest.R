@@ -34,25 +34,41 @@ runOptionBacktest <- function(opt.ds,
       
         call.delta = abs(opt.delta);
         put.delta  = -call.delta;
+        out.obj    = NULL;
         
+        # Further filtering, start with call
         nCols         = ncol(filtered);
+        call.pl       = NULL;
         call.filtered = filtered[filtered[,(nCols-1)] <  filtered[,nCols],];
+        if(nrow(call.filtered) > 0){
+            call.processed = processSignals(opt.ds$t, call.filtered, is.buy=FALSE, opt.delta=call.delta, hold.period=trade.len, product=product);
+            call.pl        = calcOptionPLFromTable(call.processed);
+            out.obj        = list(trades=call.pl$trades);
+            out.obj$total  = call.pl$total;
+            colnames(out.obj$total) = "call";
+        }
+        
+        # ...then put
+        put.pl        = NULL;
         put.filtered  = filtered[filtered[,(nCols-1)] >= filtered[,nCols],];
-        
-        # Process to get trades
-        call.processed= processSignals(opt.ds$t, call.filtered, is.buy=FALSE, opt.delta=call.delta, hold.period=trade.len, product=product);
-        put.processed = processSignals(opt.ds$t, put.filtered, is.buy=FALSE, opt.delta=put.delta, hold.period=trade.len, product=product);
-        
-        # Assemble output obj
-        call.pl       = calcOptionPLFromTable(call.processed)
-        put.pl        = calcOptionPLFromTable(put.processed);
-        out.obj       = list(trades=rbind(call.pl$trades, put.pl$trades));
-        out.obj$total = cbind(call.pl$total, put.pl$total);
-        out.obj$total[is.na(out.obj$total)] = 0;
-        colnames(out.obj$total) = c("call","put");
+        if(nrow(put.filtered) > 0){
+            put.processed = processSignals(opt.ds$t, put.filtered, is.buy=FALSE, opt.delta=put.delta, hold.period=trade.len, product=product);
+            put.pl        = calcOptionPLFromTable(put.processed);
+            
+            if(is.null(out.obj)){
+                out.obj       = list(trades=put.pl$trades);
+                out.obj$total = put.pl$total;
+                colnames(out.obj$total) = "put";
+            } else {
+                out.obj$trades= rbind(out.obj$trades, put.pl$trades);
+                out.obj$total = cbind(out.obj$total, put.pl$total);
+                out.obj$total[is.na(out.obj$total)] = 0;
+                colnames(out.obj$total) = c("call","put");
+            }
+        }
         
         # Plot
-        if(chart.results == TRUE){
+        if(!is.null(out.obj) && chart.results == TRUE){
             plotOptionTradeResults(out.obj);
         }
         return(out.obj);
