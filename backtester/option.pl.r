@@ -51,14 +51,14 @@ optionTablePL <- function(opt.table){
     tmp.cap = capital;
     
     opt.action = opt.table$action[1];
-    fut.factor = ifelse(opt.table$type[1] == "P", -opt.action, opt.action);
+    fut.factor = ifelse(toupper(opt.table$type[1]) == "P", opt.action, -opt.action);
     daily.r    = rep(0, nRows);
     
     for(i in 2:nRows){
       
         # PL options
         pl      = (opt.table$price[i] - opt.table$price[i-1]) * opt.action +
-                     (opt.table$futures[i] - opt.table$futures[i-1]) * opt.table$delta[i-1] * fut.factor;
+                     (opt.table$futures[i] - opt.table$futures[i-1]) * abs(opt.table$delta[i-1]) * fut.factor;
         pl.ret     = pl / tmp.cap;
         tmp.cap    = tmp.cap * (1 + pl.ret);
         daily.r[i] = pl.ret;
