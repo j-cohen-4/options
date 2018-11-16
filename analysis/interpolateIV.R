@@ -10,8 +10,12 @@ interpolateIV <- function(opt1, opt2, pivot, r=0.0185){
         return(0);
     }
     
-    iv1  = bscallimpvol(opt1$s0, opt1$k, r, opt1$dte, 0, opt1$cp);
-    iv2  = bscallimpvol(opt2$s0, opt2$k, r, opt2$dte, 0, opt2$cp);
+    # Error check for call price -- can't be less than intrinisic
+    call1 = ifelse(opt1$cp == 0, 0.0001, round(opt1$cp, 13));
+    call2 = ifelse(opt2$cp == 0, 0.0001, round(opt2$cp, 13));
+
+    iv1  = bscallimpvol(opt1$s0, opt1$k, r, opt1$dte, 0, call1);
+    iv2  = bscallimpvol(opt2$s0, opt2$k, r, opt2$dte, 0, call2);
     day1 = opt1$dte * 360;
     day2 = opt2$dte * 360;
     
