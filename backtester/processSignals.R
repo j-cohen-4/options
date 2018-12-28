@@ -24,7 +24,7 @@ processSignals <- function(all.dates, signals, is.buy, opt.delta, hold.period, p
             closeDt = tradeDt + hold.period;
             #signals = signals[signals$t > closeDt, ];
             message(sprintf("New trade on %s, will close on %s", tradeDt, closeDt));
-            
+
             # Get the option to trade -- keep the constant for life of trade
             the.opt                            = findOption(tradeDt, dte=120, dDelta=opt.delta, product=product);
             if(is.null(the.opt)){
@@ -77,7 +77,15 @@ processSignals <- function(all.dates, signals, is.buy, opt.delta, hold.period, p
             new.dat = getOptionPrice(contract=trade.contract, dt=trade.dates[i], 
                                      futures.contract=trade.futures, opt.type=trade.opt.type,
                                      k=trade.k, incl.delta=TRUE);
-            if(is.null(new.dat)){ next; }
+            if(is.null(new.dat)){ 
+              if(trade.action != 0){
+                  # There is no option price for at least the last trade date, can't
+                  # close so remove whole trade
+                  last.entry  = tail(which(trade.table$action != 0), 1);
+                  trade.table = head(trade.table, last.entry - 1);
+              }
+              next; 
+            }
                
             trade.table[nRowEntry, 'date']     = trade.dates[i];
             trade.table[nRowEntry, 'action']   = trade.action;
