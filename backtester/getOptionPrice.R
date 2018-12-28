@@ -12,9 +12,15 @@ getOptionPrice <- function(contract, dt, futures.contract, opt.type, k, incl.del
         return(NULL);
     }
     
-    # We know data is good, so collect option info
+    # Check for valid option price
     dat                = get(futures.contract, envir=globalenv());
     curRow             = dat[dt, ];
+    if(is.na(curRow[1, contract])){
+        message(sprintf("getOptionPrice: Unable to retrieve options price on %s so cannot continue!", dt));
+        return(NULL);
+    }
+    
+    # We know data is good, so collect option info
     return.obj$opt.prc = as.numeric(curRow[1, contract]);
     return.obj$fut.prc = fut.prc;
     
