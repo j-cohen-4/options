@@ -50,7 +50,13 @@ findATMCall <- function(theDate, sym, r=0.0185, product="crude", opt.inc=1){
             nTries = 0;
             k.orig = k;
             k      = min(as.numeric(all.ks[all.ks > k & all.ks != 0]));
-            idx    = which(all.ks == k);
+            if(is.infinite(k)){
+                idx = which(abs(k.orig - all.ks) == min(abs(k.orig - all.ks)));
+                k   = all.ks[idx];
+                message("..fixing wrong direction..");
+            } else {
+                idx    = which(all.ks == k);
+            }
 #            while(nTries <= nLimit && length(idx) == 0){
 #                k      = k + opt.inc;
 #                idx    = grep(k, colnames(dat));
@@ -74,7 +80,13 @@ findATMCall <- function(theDate, sym, r=0.0185, product="crude", opt.inc=1){
             nTries = 0;
             k.orig = k;
             k      = max(as.numeric(all.ks[all.ks < k & all.ks != 0]));
-            idx    = which(all.ks == k);
+            if(is.infinite(k)){
+              idx = which(abs(k.orig - all.ks) == min(abs(k.orig - all.ks)));
+              k   = all.ks[idx];
+              message("__fixing wrong direction__");
+            } else {
+              idx    = which(all.ks == k);
+            }
 #            while(nTries <= nLimit && length(idx) == 0){
 #                k      = k - opt.inc;
 #                idx    = grep(k, colnames(dat));
