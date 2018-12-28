@@ -13,6 +13,7 @@ runOptionBacktest <- function(opt.ds,
   
     # Where does iv need to be relative its ma?
     filtered = opt.ds[!is.na(opt.ds$ivTOma) & opt.ds$ivTOma < dIVtoMA, ];
+    filtered = filtered[!is.na(filtered$bottom),];
     
     # What cone?
     if(nConeQuadrant < 0 || nConeQuadrant > 4){
