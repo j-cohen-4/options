@@ -27,12 +27,21 @@ createFuturesTable <- function(tickers, futures){
         df[1:nRows,prcCol] = fut.dat[,2];
         
         # Standardize symbol
-        sym = strsplit(tickers[i], " ")[[1]][1];
-        if(nchar(sym) == 4){
-            sym = paste(substr(sym, 1, 3), "1", substr(sym, 4, 4), " Comdty", sep="");
-        } else {
-            sym = tickers[i];
+        sym.parts = strsplit(tickers[i], " ")[[1]];
+        sym       = tickers[i];
+        if(length(sym.parts) == 2){
+            # Format = SSMY[Y] Comdty
+            if(nchar(sym.parts[1]) == 4){
+                sym = paste(substr(sym.parts[1], 1, 3), "1", substr(sym.parts[1], 4, 4), " Comdty", sep="");
+            } 
+        } else if(length(sym.parts == 3)){
+            # Format = S MY[Y] Comdty -- investigate middle part which is exp month + year
+            if(nchar(sym.parts[2]) == 2){
+                exp = paste(substr(sym.parts[2], 1, 1), "1", substr(sym.parts[2], 2, 2), sep="");
+                sym = sprintf("%s %s Comdty", sym.parts[1], exp);
+            }
         }
+
         
         if(i == 1){
             hdr = c(sym, "PX_LAST");

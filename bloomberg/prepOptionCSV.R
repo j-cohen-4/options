@@ -15,6 +15,9 @@ prepOptionCSV <- function(sInputDir, sOutputDir){
     for(i in 1:nNum){
         
         sym = strsplit(opt.files[i], "[.]")[[1]][1];
+        if(nchar(sym) == 4){
+            sym = paste(substring(sym, 1, 3), "1", substring(sym, 4, 4), sep="");
+        }
         sym = getCommonTicker(sym);
         if(nchar(sym) == 4){
             sym = paste(substring(sym, 1, 3), "1", substring(sym, 4, 4), sep="");

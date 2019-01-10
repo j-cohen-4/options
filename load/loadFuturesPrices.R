@@ -8,16 +8,18 @@ loadFuturesPrices <- function(sFile='data/crude/CrudeFuturesPrices.csv'){
   
     dat  = read.csv(sFile, stringsAsFactors=FALSE, header=TRUE, check.names=FALSE);
     syms = colnames(dat)[seq(1, ncol(dat), 2)];
+    syms = gsub(" Comdty", "", syms);
     nNum = length(syms);
     
     for(i in 1:nNum){
       
         nDateCol = ((i - 1) * 2) + 1;
         nPrcCol  = nDateCol + 1;
-        sSym     = strsplit(syms[i], " ")[[1]][1];
-        if(nchar(sSym) == 4){
-           sSym     = sprintf("%s1%s", substr(sSym, 1, 3), substr(sSym, nchar(sSym), nchar(sSym)));
-        }        
+        sSym     = syms[i];
+        #sSym     = strsplit(syms[i], " ")[[1]][1];
+        #if(nchar(sSym) == 4){
+        #   sSym     = sprintf("%s1%s", substr(sSym, 1, 3), substr(sSym, nchar(sSym), nchar(sSym)));
+        #}        
         # Get data
         dates    = dat[,nDateCol];
         dates    = dates[dates != ""];
