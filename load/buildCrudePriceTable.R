@@ -25,6 +25,7 @@ buildCrudePriceTable <- function(futuresSymbol, data.dir="data/crude/", product=
     exp.date = prod.option.exps[prod.option.exps[,1] == futuresSymbol, 2];
     opt      = loadOptionPrices(sOptionFile, expiration=exp.date);
     tbl      = cbind(prod.futures[,futuresSymbol], opt);
+    colnames(tbl) = c(futuresSymbol, colnames(opt));
     
     # Put in global env too
     assign(x=futuresSymbol, value=tbl, envir=g_env);
